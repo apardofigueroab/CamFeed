@@ -59,6 +59,7 @@
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
             overflow: hidden;
             transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            cursor: pointer;
         }
         .camera-card:hover {
             transform: translateY(-0.5rem);
@@ -71,6 +72,7 @@
             overflow: hidden;
             border-top-left-radius: 0.75rem;
             border-top-right-radius: 0.75rem;
+            background-color: #000;
         }
         .camera-frame {
             position: absolute;
@@ -89,18 +91,17 @@
             font-weight: 500;
             color: #4b5563;
             margin-bottom: 0.5rem;
-            cursor: pointer;
-            color: #2563eb; /* Make title blue (link color) */
-            text-decoration: underline;
-        }
-        .camera-title:hover {
-            text-decoration: underline;
-            color: #1e40af;
         }
         .load-fail-message {
             color: #dc2626;
             font-size: 0.875rem;
-            margin-top: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            background-color: #f3f4f6;
+            text-align: center;
+            padding: 1rem;
         }
         .modal {
             display: none;
@@ -113,19 +114,17 @@
             overflow: auto;
             background-color: rgba(0,0,0,0.5);
         }
-
         .modal-content {
             background-color: #fefefe;
-            margin: 10% auto;
+            margin: 5% auto;
             padding: 20px;
             border: 1px solid #888;
             width: 90%;
-            max-width: 800px;
+            max-width: 1000px;
             border-radius: 0.75rem;
             position: relative;
             box-shadow: 0 6px 8px -1px rgba(0, 0, 0, 0.1), 0 4px 6px -1px rgba(0, 0, 0, 0.08);
         }
-
         .modal-header {
             display: flex;
             justify-content: space-between;
@@ -134,33 +133,25 @@
             padding-bottom: 0.5rem;
             border-bottom: 1px solid #e5e7eb;
         }
-
         .modal-header h2 {
             margin: 0;
             font-size: 1.5rem;
             color: #1e293b;
         }
-
         .close-button {
-            position: absolute;
-            top: 10px;
-            right: 10px;
             color: #aaa;
             font-size: 28px;
             font-weight: bold;
             cursor: pointer;
         }
-
         .close-button:hover,
         .close-button:focus {
             color: #000;
             text-decoration: none;
         }
-
         .modal-body {
             padding-bottom: 1rem;
         }
-
         .modal-video-wrapper {
             position: relative;
             padding-bottom: 56.25%;
@@ -169,7 +160,6 @@
             border-radius: 0.75rem;
             background-color: black;
         }
-
         .modal-video-frame {
             position: absolute;
             top: 0;
@@ -178,11 +168,9 @@
             height: 100%;
             border: none;
         }
-
         .modal-footer {
             text-align: right;
         }
-
         .modal-footer button {
             padding: 0.75rem 1.5rem;
             border-radius: 0.375rem;
@@ -194,7 +182,6 @@
             border: none;
             font-size: 1rem;
         }
-
         .modal-footer button:hover {
             background-color: #2563eb;
         }
@@ -220,15 +207,33 @@
     <main class="container">
         <div class="heading-wrapper">
             <h2 class="section-title">Live Camera Views of Miami-Dade County</h2>
-            <p class="text-gray-600 text-lg">Explore live camera feeds from around Miami-Dade County.  See what's happening now at various locations.</p>
+            <p class="text-gray-600 text-lg">Explore live camera feeds from around Miami-Dade County. Click a feed to view it in a larger window. If a feed is unavailable, click the link to visit the source.</p>
         </div>
 
         <section class="county-section">
             <h3 class="county-title">Miami-Dade County</h3>
-            <div class="camera-grid" id="miami-dade-cameras">
-                </div>
+            <div class="camera-grid" id="miami-dade-cameras"></div>
         </section>
     </main>
+
+    <!-- Modal for enlarged feed -->
+    <div id="cameraModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle"></h2>
+                <span class="close-button">×</span>
+            </div>
+            <div class="modal-body">
+                <div class="modal-video-wrapper">
+                    <iframe id="modalFrame" class="modal-video-frame" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+                </div>
+                <p id="modalError" class="load-fail-message" style="display: none;">Camera feed unavailable. <a id="modalErrorLink" href="#" target="_blank" class="text-blue-600 underline">View source</a></p>
+            </div>
+            <div class="modal-footer">
+                <button id="visitSource">Visit Source</button>
+            </div>
+        </div>
+    </div>
 
     <script>
         const cameraData = [
@@ -245,27 +250,27 @@
             {
                 county: "Miami-Dade County",
                 title: "Miami International Airport Webcam",
-                src: "https://www.geocam.ru/en/video/miami-airport-webcam/",
+                src: "https://www.youtube.com/embed/8X1hO7_4ZSw", // Placeholder: Replace with actual YouTube embed
             },
             {
                 county: "Miami-Dade County",
                 title: "Brickell Key Waterfront Webcam",
-                src: "https://www.geocam.ru/en/video/brickell-key-webcam-miami/",
+                src: "https://www.youtube.com/embed/9Y8XzZ7_3Qw", // Placeholder: Replace with actual YouTube embed
             },
             {
                 county: "Miami-Dade County",
                 title: "Coral City Camera",
-                src: "https://www.geocam.ru/en/video/coral-city-webcam/",
+                src: "https://www.youtube.com/embed/8X1hO7_4ZSw", // Placeholder: Replace with actual YouTube embed
             },
             {
                 county: "Miami-Dade County",
                 title: "Sunny Isles Beach Cam",
                 src: "https://sunnyislesbeachmiami.com/beach-cam/",
             },
-             {
+            {
                 county: "Miami-Dade County",
                 title: "Haulover Beach Cam",
-                src: "https://www.miamidade.gov/parks/haulover-beach.asp",
+                src: "https://www.visitlauderdale.com/beachcams/", // Alternative: Check for specific Haulover feed
             },
             {
                 county: "Miami-Dade County",
@@ -275,7 +280,7 @@
             {
                 county: "Miami-Dade County",
                 title: "Hollywood Beach Webcams",
-                src: "https://www.hollywoodfl.org/1047/Hollywood-Beach-Webcams",
+                src: "https://www.visitlauderdale.com/beachcams/",
             },
             {
                 county: "Miami-Dade County",
@@ -290,33 +295,75 @@
         ];
 
         const miamiDadeCamerasContainer = document.getElementById("miami-dade-cameras");
+        const modal = document.getElementById("cameraModal");
+        const modalTitle = document.getElementById("modalTitle");
+        const modalFrame = document.getElementById("modalFrame");
+        const modalError = document.getElementById("modalError");
+        const modalErrorLink = document.getElementById("modalErrorLink");
+        const visitSourceBtn = document.getElementById("visitSource");
+        const closeButton = document.querySelector(".close-button");
 
         function createCameraCard(camera) {
             const card = document.createElement("div");
             card.className = "camera-card";
+            card.dataset.src = camera.src;
+            card.dataset.title = camera.title;
+
+            const frameWrapper = document.createElement("div");
+            frameWrapper.className = "camera-frame-wrapper";
+
+            const iframe = document.createElement("iframe");
+            iframe.className = "camera-frame";
+            iframe.src = camera.src;
+            iframe.allow = "autoplay; encrypted-media";
+            iframe.allowFullscreen = true;
+            iframe.loading = "lazy";
+
+            const errorMessage = document.createElement("div");
+            errorMessage.className = "load-fail-message";
+            errorMessage.style.display = "none";
+            errorMessage.innerHTML = `Camera feed unavailable. <a href="${camera.src}" target="_blank" class="text-blue-600 underline">View source</a>`;
+
+            frameWrapper.appendChild(iframe);
+            frameWrapper.appendChild(errorMessage);
 
             const info = document.createElement("div");
             info.className = "camera-info";
 
             const title = document.createElement("h3");
             title.className = "camera-title";
+            title.textContent = camera.title;
 
-            // Create an anchor tag for the title
-            const link = document.createElement("a");
-            link.href = camera.src;
-            link.target = "_blank"; // Opens in a new tab
-            link.textContent = camera.title;
-            link.className = "text-blue-600 hover:underline"; // Style link
-
-            title.appendChild(link); // Put link in title
             info.appendChild(title);
-
-            const placeholder = document.createElement("div");
-            placeholder.className = "camera-frame-wrapper flex items-center justify-center bg-gray-200 text-gray-500 text-sm";
-            placeholder.innerHTML = `<p>Click title for live feed</p>`;
-
-            card.appendChild(placeholder);
+            card.appendChild(frameWrapper);
             card.appendChild(info);
+
+            iframe.onerror = () => {
+                iframe.style.display = "none";
+                errorMessage.style.display = "flex";
+            };
+            iframe.onload = () => {
+                errorMessage.style.display = "none";
+                iframe.style.display = "block";
+            };
+
+            card.addEventListener("click", () => {
+                modalTitle.textContent = camera.title;
+                modalFrame.src = camera.src;
+                modalError.style.display = "none";
+                modalErrorLink.href = camera.src;
+                visitSourceBtn.onclick = () => window.open(camera.src, "_blank");
+                modal.style.display = "block";
+
+                modalFrame.onerror = () => {
+                    modalFrame.style.display = "none";
+                    modalError.style.display = "block";
+                };
+                modalFrame.onload = () => {
+                    modalError.style.display = "none";
+                    modalFrame.style.display = "block";
+                };
+            });
 
             return card;
         }
@@ -327,6 +374,18 @@
                 miamiDadeCamerasContainer.appendChild(cameraCard);
             });
         }
+
+        closeButton.addEventListener("click", () => {
+            modal.style.display = "none";
+            modalFrame.src = "";
+        });
+
+        window.addEventListener("click", (event) => {
+            if (event.target === modal) {
+                modal.style.display = "none";
+                modalFrame.src = "";
+            }
+        });
 
         loadCameras();
     </script>
