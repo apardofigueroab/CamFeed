@@ -90,10 +90,12 @@
             color: #4b5563;
             margin-bottom: 0.5rem;
             cursor: pointer;
+            color: #2563eb; /* Make title blue (link color) */
+            text-decoration: underline;
         }
         .camera-title:hover {
             text-decoration: underline;
-            color: #2563eb;
+            color: #1e40af;
         }
         .load-fail-message {
             color: #dc2626;
@@ -226,27 +228,6 @@
             <div class="camera-grid" id="miami-dade-cameras">
                 </div>
         </section>
-
-        <div id="video-modal" class="modal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2></h2>
-                    <button id="close-modal" class="close-button" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div class="modal-video-wrapper">
-                        <iframe id="modal-video-frame" class="modal-video-frame" allow="autoplay; fullscreen"></iframe>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button id="modal-mute-button">
-                        <span id="mute-icon" aria-hidden="true">&#128266;</span> <span class="sr-only">Mute</span>
-                    </button>
-                </div>
-            </div>
-        </div>
     </main>
 
     <script>
@@ -309,42 +290,32 @@
         ];
 
         const miamiDadeCamerasContainer = document.getElementById("miami-dade-cameras");
-        const modal = document.getElementById("video-modal");
-        const modalCloseBtn = document.getElementById("close-modal");
-        const modalTitle = modal.querySelector("h2");
-        const modalVideoFrame = document.getElementById("modal-video-frame");
-        const modalMuteButton = document.getElementById("modal-mute-button");
-        const muteIcon = document.getElementById("mute-icon");
-
-        let isMuted = false;
 
         function createCameraCard(camera) {
             const card = document.createElement("div");
             card.className = "camera-card";
-
-            const frameWrapper = document.createElement("div");
-            frameWrapper.className = "camera-frame-wrapper";
-
-            const frame = document.createElement("iframe");
-            frame.className = "camera-frame";
-            frame.src = camera.src;
-            frame.allow = "autoplay; fullscreen";
-            frame.onerror = () => {
-                frameWrapper.innerHTML = `<p class="load-fail-message">Failed to load camera feed.</p>`;
-            };
-
-            frameWrapper.appendChild(frame);
-            card.appendChild(frameWrapper);
 
             const info = document.createElement("div");
             info.className = "camera-info";
 
             const title = document.createElement("h3");
             title.className = "camera-title";
-            title.textContent = camera.title;
-            title.addEventListener("click", () => openModal(camera.src, camera.title));
+
+            // Create an anchor tag for the title
+            const link = document.createElement("a");
+            link.href = camera.src;
+            link.target = "_blank"; // Opens in a new tab
+            link.textContent = camera.title;
+            link.className = "text-blue-600 hover:underline"; // Style link
+
+            title.appendChild(link); // Put link in title
             info.appendChild(title);
 
+            const placeholder = document.createElement("div");
+            placeholder.className = "camera-frame-wrapper flex items-center justify-center bg-gray-200 text-gray-500 text-sm";
+            placeholder.innerHTML = `<p>Click title for live feed</p>`;
+
+            card.appendChild(placeholder);
             card.appendChild(info);
 
             return card;
@@ -356,38 +327,6 @@
                 miamiDadeCamerasContainer.appendChild(cameraCard);
             });
         }
-
-        function openModal(src, title) {
-            modalTitle.textContent = title;
-            modalVideoFrame.src = src;
-            modal.style.display = "block";
-            document.body.style.overflow = "hidden";
-        }
-
-        function closeModal() {
-            modal.style.display = "none";
-            modalVideoFrame.src = "";
-            document.body.style.overflow = "";
-        }
-
-        modalCloseBtn.addEventListener("click", closeModal);
-
-        window.addEventListener("click", (event) => {
-            if (event.target === modal) {
-                closeModal();
-            }
-        });
-
-        modalMuteButton.addEventListener("click", () => {
-            isMuted = !isMuted;
-            if (isMuted) {
-                muteIcon.textContent = "\uD83D\uDD07";
-                modalVideoFrame.muted = true;
-            } else {
-                muteIcon.textContent = "\uD83D\uDD0A";
-                modalVideoFrame.muted = false;
-            }
-        });
 
         loadCameras();
     </script>
